@@ -40,16 +40,43 @@
                 </div>
               </a>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link justify-content-between"  
-                href="#" aria-expanded="false">
+            {{-- ================= Carreras ================= --}}
+            <li class="sidebar-item {{ request()->is('carreras') ? 'selected' : '' }}">
+              <a class="sidebar-link justify-content-between"
+                href="{{ route('carreras.index') }}"
+                aria-expanded="false">
                 <div class="d-flex align-items-center gap-3">
                   <span class="d-flex">
-                    <i class="ti ti-shopping-cart"></i>
+                    <i class="ti ti-aperture"></i>
                   </span>
-                  <span class="hide-menu">Estudiantes</span>
+                  <span class="hide-menu">Carreras</span>
                 </div>
-                
+              </a>
+            </li>
+            {{-- ================= Áreas ================= --}}
+            <li class="sidebar-item {{ request()->is('areas*') ? 'selected' : '' }}">
+              <a class="sidebar-link justify-content-between"
+                href="{{ route('areas.index') }}"
+                aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex">
+                    <i class="ti ti-list-details"></i>
+                  </span>
+                  <span class="hide-menu">Áreas</span>
+                </div>
+              </a>
+            </li>
+            {{-- ================= Preguntas ================= --}}
+            <li class="sidebar-item {{ request()->is('preguntas*') ? 'selected' : '' }}">
+              <a class="sidebar-link justify-content-between"
+                href="{{ route('preguntas.index') }}"
+                aria-expanded="false">
+                <div class="d-flex align-items-center gap-3">
+                  <span class="d-flex">
+                    <i class="ti ti-list-details"></i>
+                  </span>
+                  <span class="hide-menu">Preguntas</span>
+                </div>
               </a>
             </li>
             <li class="sidebar-item">
