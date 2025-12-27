@@ -5,7 +5,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\RolController;
 
 Route::get('/', function () {
-    return view('cuestionario.dashboard');
+    return view('welcome');
 });
 
 

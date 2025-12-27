@@ -47,7 +47,7 @@
                   <span class="d-flex">
                     <i class="ti ti-shopping-cart"></i>
                   </span>
-                  <span class="hide-menu">eCommerce</span>
+                  <span class="hide-menu">Estudiantes</span>
                 </div>
                 
               </a>
@@ -58,7 +58,7 @@
                   <span class="d-flex">
                     <i class="ti ti-layout-grid"></i>
                   </span>
-                  <span class="hide-menu">Front Pages</span>
+                  <span class="hide-menu">EXAMENES</span>
                 </div>
                 
               </a>
@@ -70,7 +70,7 @@
                       <div class="round-16 d-flex align-items-center justify-content-center">
                         <i class="ti ti-circle"></i>
                       </div>
-                      <span class="hide-menu">Homepage</span>
+                      <span class="hide-menu">Cree</span>
                     </div>
                     
                   </a>
