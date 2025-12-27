@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\EstudianteController;
 use App\Http\Controllers\RolController;
 use App\Http\Controllers\CarreraController;
 use App\Http\Controllers\PreguntaController;
@@ -40,9 +41,10 @@ Route::get('/', function () use ($SUPER_ADMIN_ID, $ESTUDIANTE_ID) {
         return view('welcome');
     }
 
-    // Estudiante -> cuestionario dashboard
+    // ERROR CORREGIDO AQUÍ: 
+    // En lugar de return view('estudiante.index'), llamamos al método del controlador
     if ((int)$user->id_rol === (int)$ESTUDIANTE_ID) {
-        return view('cuestionario.dashboard');
+        return app(EstudianteController::class)->index(); 
     }
 
     // Cualquier otro rol -> por defecto al cuestionario (o lo cambias)
@@ -102,7 +104,22 @@ Route::post('preguntas/{id}/opciones', [PreguntaController::class, 'guardarOpcio
 
 // ✅ SOLO ESTUDIANTE
 Route::middleware(['auth', "role:$ESTUDIANTE_ID"])->group(function () {
-    Route::get('/cuestionario', fn() => view('cuestionario.dashboard'))->name('cuestionario.dashboard');
-    Route::get('/cuestionario/index', fn() => view('cuestionario.index'))->name('cuestionario.index');
-    Route::get('/cuestionario/notas', fn() => view('cuestionario.notas'))->name('cuestionario.notas');
+    // Dashboard y lista de carreras
+    Route::get('/estudiante', [EstudianteController::class, 'index'])->name('estudiante.dashboard');
+    Route::get('/estudiante/index', [EstudianteController::class, 'index'])->name('estudiante.index');
+    
+    // Historial de exámenes del estudiante
+    Route::get('/estudiante/notas', [EstudianteController::class, 'misNotas'])->name('estudiante.notas');
+
+    // Lógica del Examen
+    // 1. Inicia y genera las preguntas aleatorias
+    Route::get('/examen/iniciar/{id}', [EstudianteController::class, 'iniciarExamen'])->name('examen.iniciar');
+    
+    // 2. Procesa el envío de respuestas vía AJAX (Fetch)
+    Route::post('/examen/finalizar', [EstudianteController::class, 'finalizarExamen'])->name('examen.finalizar');
+    
+    // 3. Muestra el detalle de aciertos/errores con las preguntas de la sesión
+    Route::get('/examen/resultado/{id}', [EstudianteController::class, 'mostrarResultado'])->name('examen.resultado');
+
+    Route::get('/estudiante/rendimiento', [EstudianteController::class, 'rendimiento'])->name('estudiante.rendimiento');
 });

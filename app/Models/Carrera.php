@@ -15,4 +15,10 @@ class Carrera extends Model
         'gestion_carrera',
         'estado_carrera'
     ];
+
+    // RELACIÓN: Una carrera tiene muchas áreas
+    public function areas()
+    {
+        return $this->hasMany(Area::class, 'id_carrera', 'id_carrera');
+    }
 }
