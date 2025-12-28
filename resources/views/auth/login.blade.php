@@ -117,11 +117,11 @@
         <div class="provider-title">¿NO TIENES CUENTA? ADQUIÉRELA AQUÍ:</div>
 
         <div class="qr-placeholder">
-            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/591XXXXXXXX" alt="QR WhatsApp">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://wa.me/59177070513" alt="QR WhatsApp">
         </div>
 
-        <a href="https://wa.me/591XXXXXXXX" class="contact-info">
-            📱 WhatsApp Proveedor: +591 XXXXXXXX
+        <a href="https://wa.me/59177070513" class="contact-info">
+            📱 WhatsApp Proveedor: +591 77070513
         </a>
         <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 10px;">
             Escanea el QR o haz clic en el botón para contactar al soporte técnico.
