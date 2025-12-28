@@ -14,10 +14,56 @@
         }
         body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; overflow-x: hidden; }
         
-        /* Modal Styles */
+        /* --- OVERLAY DE CARGA PANTALLA COMPLETA --- */
+        #loadingOverlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.95); /* Color oscuro semi-transparente */
+            z-index: 9999; /* Por encima de todo */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .loader-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main-spinner {
+            width: 70px;
+            height: 70px;
+            border: 5px solid rgba(56, 189, 248, 0.1);
+            border-top: 5px solid var(--accent-celeste);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+
+        .loading-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-celeste);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .loading-subtext {
+            color: var(--text-dim);
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Estilos del Modal Normal */
         #finishModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--bg-card); padding: 40px; border-radius: 28px; border: 1px solid var(--accent-celeste); text-align: center; max-width: 450px; width: 90%; box-shadow: 0 0 30px rgba(56, 189, 248, 0.2); }
 
+        /* Contenedor Principal */
         .container { width: 100%; max-width: 850px; background: var(--bg-card); border-radius: 28px; padding: 30px; box-shadow: 0 25px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05); position: relative; }
         .header-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 20px; }
         .timer-box { background: rgba(244, 63, 94, 0.1); border: 1px solid var(--danger); color: var(--danger); padding: 10px 15px; border-radius: 12px; font-weight: 700; font-family: monospace; font-size: 1.2rem; min-width: 100px; text-align: center; }
@@ -40,17 +86,27 @@
         .nav-buttons { display: flex; gap: 15px; }
         .btn-nav { padding: 16px 25px; border-radius: 14px; border: none; font-weight: 700; cursor: pointer; flex: 1; transition: 0.2s; }
         .btn-finish { background: linear-gradient(135deg, #f43f5e, #e11d48); color: white; }
-        .btn-nav:active { transform: scale(0.98); }
         
-        @media (max-width: 600px) { .options-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 600px) { 
+            .options-grid { grid-template-columns: 1fr; } 
+            .loading-text { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
+<div id="loadingOverlay">
+    <div class="loader-box">
+        <div class="main-spinner"></div>
+        <div class="loading-text">CALCULANDO RESULTADOS</div>
+        <div class="loading-subtext">Por favor, no cierres esta ventana...</div>
+    </div>
+</div>
+
 <div id="finishModal">
     <div class="modal-content">
         <h2 style="color:var(--accent-celeste); margin-top:0;">¿Finalizar Examen?</h2>
-        <p style="color:var(--text-dim); line-height: 1.5;">Has completado <span id="modal-prog">0%</span> del examen. Al confirmar, no podrás cambiar tus respuestas.</p>
+        <p style="color:var(--text-dim); line-height: 1.5;">Has completado <span id="modal-prog">0%</span> del examen.</p>
         <div style="display:flex; gap:15px; margin-top:30px;">
             <button onclick="closeModal()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--plomo-unselect); color:white; cursor:pointer; font-weight:700;">REGRESAR</button>
             <button onclick="processFinish()" style="flex:1; padding:15px; border-radius:12px; border:none; background:var(--accent-celeste); color:var(--bg-dark); cursor:pointer; font-weight:700;">SÍ, TERMINAR</button>
@@ -95,13 +151,12 @@
 </div>
 
 <script>
-    // Datos inyectados desde el controlador
     const EXAM_DATA = @json($areas);
     const EXAM_ID = {{ $examen->id_examen }};
     
     let curArea = 0, curQ = 0;
     let results = EXAM_DATA.map(area => area.preguntas.map(() => null));
-    let timeLeft = 2 * 60 * 60; // 2 Horas en segundos
+    let timeLeft = 2 * 60 * 60; 
     let timerInterval;
 
     function startTimer() {
@@ -109,7 +164,7 @@
         timerInterval = setInterval(() => {
             if (timeLeft <= 0) {
                 clearInterval(timerInterval);
-                processFinish(true); // Finaliza automáticamente
+                processFinish();
                 return;
             }
             timeLeft--;
@@ -121,7 +176,6 @@
     function render() {
         const area = EXAM_DATA[curArea];
         const pregunta = area.preguntas[curQ];
-        
         if (!pregunta) return;
 
         document.getElementById('info-tag').innerText = `${area.nombre_area} • Pregunta ${curQ + 1} de ${area.preguntas.length}`;
@@ -131,7 +185,6 @@
         grid.innerHTML = '';
         const colors = ['var(--opt-a)', 'var(--opt-b)', 'var(--opt-c)', 'var(--opt-d)'];
         
-        // El controlador ya trae limitado a 4 opciones
         pregunta.opciones.forEach((opc, i) => {
             const b = document.createElement('button');
             b.className = 'option';
@@ -164,10 +217,8 @@
                 if (a === curArea && q === curQ) item.classList.add('current');
                 item.onclick = (e) => { 
                     e.stopPropagation(); 
-                    curArea = a; 
-                    curQ = q; 
-                    closeAll(); 
-                    render(); 
+                    curArea = a; curQ = q; 
+                    closeAll(); render(); 
                 };
                 drop.appendChild(item);
             });
@@ -204,17 +255,17 @@
     }
 
     function closeAll() { document.querySelectorAll('.q-dropdown').forEach(d => d.style.display = 'none'); }
+    function openModal() { document.getElementById('finishModal').style.display = 'flex'; }
+    function closeModal() { document.getElementById('finishModal').style.display = 'none'; }
 
-    // LÓGICA DEL MODAL Y ENVÍO
-    function openModal() {
-        document.getElementById('finishModal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('finishModal').style.display = 'none';
-    }
-
+    // --- FUNCIÓN PARA PROCESAR EL FINAL CON EL OVERLAY ---
     function processFinish() {
+        // Cierra el modal de confirmación
+        closeModal();
+        
+        // Muestra el Overlay de carga a pantalla completa
+        document.getElementById('loadingOverlay').style.display = 'flex';
+        
         clearInterval(timerInterval);
         
         const data = {
@@ -234,12 +285,20 @@
         .then(res => res.json())
         .then(res => {
             if(res.success) {
-                window.location.href = res.redirect_url;
+                // Pequeña espera de 0.5s para que se vea la animación si la respuesta es muy rápida
+                setTimeout(() => {
+                    window.location.href = res.redirect_url;
+                }, 500);
             } else {
+                document.getElementById('loadingOverlay').style.display = 'none';
                 alert("Error al guardar el examen.");
             }
         })
-        .catch(err => console.error("Error:", err));
+        .catch(err => {
+            console.error("Error:", err);
+            document.getElementById('loadingOverlay').style.display = 'none';
+            alert("Ocurrió un error inesperado.");
+        });
     }
 
     startTimer();
