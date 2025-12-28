@@ -17,9 +17,20 @@ class Area extends Model
         'id_carrera'
     ];
 
-    // Relación
+    /**
+     * RELACIÓN: Una área pertenece a una carrera.
+     */
     public function carrera()
     {
         return $this->belongsTo(Carrera::class, 'id_carrera', 'id_carrera');
+    }
+
+    /**
+     * RELACIÓN: Una área tiene muchas preguntas.
+     * ESTA ES LA FUNCIÓN QUE DEBES AGREGAR:
+     */
+    public function preguntas()
+    {
+        return $this->hasMany(Pregunta::class, 'id_area', 'id_area');
     }
 }
